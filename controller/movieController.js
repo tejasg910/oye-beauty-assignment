@@ -16,7 +16,6 @@ export const getAllMovies = async (req, res, next) => {
 
 export const addMovie = async (req, res, next) => {
   try {
-    console.log(req.body);
     const {
       title,
       description,
@@ -57,23 +56,11 @@ export const addMovie = async (req, res, next) => {
   }
 };
 
-export const search = async (req, res, next) => {
-  try {
-    const { title, offset } = req.query;
-
-    const titleRegex = new RegExp(title);
-    db.collection.find({ title: { $regex: titleRegex } });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
 export const getPaginated = async (req, res, next) => {
   const { page, size } = req.query;
   try {
-    const data = await Movie.find({})
-      .skip((page - 1) * 10)
-      .limit(size);
+    let skip = (page - 1) * size;
+    const data = await Movie.find({}).skip(skip).limit(parseInt(size));
     res.status(200).json({ success: true, data });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
